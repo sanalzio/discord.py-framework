@@ -15,3 +15,8 @@ con={
     "statusgame": discord.ActivityType.playing
 }
 ```
+
+# and you can use..
+and you can use direct:
+https://github.com/sanalzio/PyDB
+https://github.com/sanalzio/PyGistDB
