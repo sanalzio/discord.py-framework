@@ -1,0 +1,6 @@
+cmd=[""]
+info=""
+usage=""
+import discord
+async def run(client, message, args):
+    
