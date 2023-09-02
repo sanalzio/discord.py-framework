@@ -17,6 +17,9 @@ con={
 ```
 
 # and you can use..
+## you can use ultimate auto help command
+## you can use ultimate auto commands system
+## you can use multiple prefix system
 and you can use direct:
 https://github.com/sanalzio/PyDB
 https://github.com/sanalzio/PyGistDB
