@@ -1,7 +1,7 @@
 # discord.py-framework
 A simple discord.py library discord bot framework.
 
-# cutomize
+# cutomize<br>
 edit database\config.py file
 ```py
 import discord
@@ -16,10 +16,10 @@ con={
 }
 ```
 
-# and you can use..
-## you can use ultimate auto help command
-## you can use ultimate auto commands system
-## you can use multiple prefix system
-and you can use direct:
-https://github.com/sanalzio/PyDB
+# and you can use..<br>
+## you can use ultimate auto help command<br>
+## you can use ultimate auto commands system<br>
+## you can use multiple prefix system<br>
+and you can use direct:<br>
+https://github.com/sanalzio/PyDB<br>
 https://github.com/sanalzio/PyGistDB
