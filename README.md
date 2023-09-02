@@ -22,5 +22,5 @@ con={
 ## you can use multiple prefix system<br>
 and you can use direct:<br>
 https://github.com/sanalzio/PyDB<br>
-https://github.com/sanalzio/PyGistDB
+https://github.com/sanalzio/PyGistDB<br>
 (with modules.PyDB or modules.pygistdb)
