@@ -1,6 +1,6 @@
 """# PyDB
 # A Simple Database Module"""
-__version__ = 1.7
+__version__ = 1.8
 __name__ = "pydb"
 
 class pydb:
@@ -8,12 +8,13 @@ class pydb:
     ## Example:
     ```py
     import PyDB
-    db=PyDB.pydb("File.x")
+    db=PyDB.pydb("Filename")
     ```
     """
-    def __init__(self, f):
-        self.file=f
-    def getData(self, key:str):
+    def __init__(self, file:str):
+        self.file=file+".pydb"
+    def getData(self, key):
+        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -24,7 +25,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         print(db.getData("key1"))
         ```
         ### Output:
@@ -54,7 +55,7 @@ class pydb:
                             elif a[1]=="{None}\n":
                                 return None
                             else:
-                                return a[1].replace("\n", "")
+                                return a[1].replace("\n", "").replace("\\n", "\n")
                         elif len(a)>2:
                             return ":".join(a[1:]).replace("\n", "")
     def keys(self):
@@ -68,7 +69,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         print(db.keys())
         ```
         ### Output:
@@ -80,7 +81,7 @@ class pydb:
             keys=[]
             lines = f.readlines()
             for i in lines:
-                keys.append(i.split(':')[0].replace("\n", ""))
+                keys.append(i.split(':')[0].replace("\n", "").replace("\\n", "\n"))
             return tuple(keys)
     def values(self):
         """
@@ -93,7 +94,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         print(db.values())
         ```
         ### Output:
@@ -106,9 +107,9 @@ class pydb:
             lines = f.readlines()
             for i in lines:
                 if len(i.split(':')) < 3:
-                    keys.append(i.split(':')[1].replace("\n", ""))
+                    keys.append(i.split(':')[1].replace("\n", "").replace("\\n", "\n"))
                 else:
-                    keys.append(":".join(i.split(':')[1:].replace("\n", "")))
+                    keys.append(":".join(i.split(':')[1:]).replace("\n", "").replace("\\n", "\n"))
             return tuple(keys)
     def items(self):
         """
@@ -121,7 +122,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         print(db.items())
         ```
         ### Output:
@@ -134,11 +135,12 @@ class pydb:
             lines = f.readlines()
             for i in lines:
                 if len(i.split(':')) < 3:
-                    items.append([i.split(':')[0], i.split(':')[1].replace("\n", "")])
+                    items.append([i.split(':')[0].replace("\\n", "\n"), i.split(':')[1].replace("\n", "").replace("\\n", "\n")])
                 else:
-                    items.append([i.split(':')[0], ":".join(i.split(':')[1:]).replace("\n", "")])
+                    items.append([i.split(':')[0].replace("\\n", "\n"), ":".join(i.split(':')[1:]).replace("\n", "").replace("\\n", "\n")])
             return tuple(items)
     def addData(self, key, value):
+        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -149,7 +151,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         db.addData("key3", "holla")
         ```
         ### New file.db file:
@@ -160,7 +162,15 @@ class pydb:
         ```
         """
         with open(self.file, 'r+', encoding="utf-8") as f:
-            valu=value.replace("\n","")
+            valu=value
+            if value==True:
+                valu="{True}"
+            if value==False:
+                valu="{False}"
+            if value==None:
+                valu="{None}"
+            else:
+                valu=value.replace("\n","\\n")
             keys=[]
             lines = f.readlines()
             for i in lines:
@@ -169,11 +179,12 @@ class pydb:
                 if lines!=[]:
                     if lines[len(lines)-1].find('\n') == -1:
                         lines[len(lines)-1]=lines[len(lines)-1]+'\n'
-                lines.append(str(key).replace("\n", "").replace(":", "")+':'+str(valu).replace("\n", "")+'\n')
+                lines.append(str(key).replace("\n", "\\n").replace(":", "")+':'+str(valu).replace("\n", "\\n")+'\n')
             f.seek(0)
             f.writelines(lines)
             f.truncate()
     def removeData(self, key):
+        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -185,7 +196,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         db.removeData("key3")
         ```
         ### New file.db file:
@@ -213,7 +224,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         db.clear()
         ```
         ### New file.db file:
@@ -234,8 +245,8 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
-        db.backUp("newFile.db")
+        db=PyDB.pydb("filename")
+        db.backUp("newFile")
         ```
         ### newFile.db file:
         ```
@@ -245,9 +256,10 @@ class pydb:
         """
         with open(self.file, 'r', encoding="utf-8") as f:
             lines = f.readlines()
-            with open(newfile, 'w') as f:
+            with open(newfile+".pydb", 'w') as f:
                 f.writelines(lines)
     def setData(self, key, newValue):
+        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -258,7 +270,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         db.setData("key2", "holla")
         ```
         ### newFile.db file:
@@ -267,11 +279,18 @@ class pydb:
         key2:holla
         ```
         """
+        if newValue==True:
+            valu="{True}"
+        if newValue==False:
+            valu="{False}"
+        if newValue==None:
+            valu="{None}"
+        valu = str(newValue).replace("\n","\\n")
         with open(self.file, 'r+', encoding="utf-8") as f:
             lines = f.readlines()
             for i in lines:
                 if i.split(':')[0]==str(key):
-                    lines[lines.index(i)]=str(key).replace("\n", "").replace(":", "")+':'+str(newValue).replace("\n", "")+'\n'
+                    lines[lines.index(i)]=str(key).replace("\n", "").replace(":", "")+':'+valu+'\n'
                     f.seek(0)
                     with open(self.file, 'w') as fi:
                         fi.writelines(lines)
@@ -286,7 +305,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         db.fileToDICT()
         ```
         ### Output:
@@ -311,7 +330,7 @@ class pydb:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pydb("file.db")
+        db=PyDB.pydb("filename")
         db.dictToFILE({'key1':'hello','key2','hallo'})
         ```
         ### file.db file:
@@ -326,6 +345,7 @@ class pydb:
                 lines.append("{}:{}\n".format(str(k).replace("\n", "").replace(":", ""),str(v).replace("\n","")))
             f.writelines(lines)
     def control(self, key):
+        key=str(key)
         """
         ### This Command Checks Whether There Is a Counterpart to the Key
         """
@@ -344,11 +364,11 @@ class pylist:
     ## Example:
     ```py
     import PyDB
-    db=PyDB.pylist("File.x")
+    db=PyDB.pylist("Filename")
     ```
     """
     def __init__(self, file:str):
-        self.f=file
+        self.f=file+".pydb"
     def getData(self, index:int):
         """
         ## Example:
@@ -360,7 +380,7 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         print(db.getData(0))
         ```
         ### Output:
@@ -380,7 +400,7 @@ class pylist:
                 elif l[int(index)].replace("\n", "") == "{None}":
                     return None
                 else:
-                    return l[int(index)].replace("\n", "")
+                    return l[int(index)].replace("\n", "").replace("\\n", "\n")
     def listFile(self):
         """
         ## Example:
@@ -392,7 +412,7 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         print(db.listFile())
         ```
         ### Output:
@@ -404,16 +424,25 @@ class pylist:
             liste=f.readlines()
             op = []
             for i in liste:
-                a=i.replace("\n","")
+                if i.replace("\n","")=="{True}":
+                    op.append(True)
+                    continue
+                if i.replace("\n","")=="{False}":
+                    op.append(False)
+                    continue
+                if i.replace("\n","")=="{None}":
+                    op.append(None)
+                    continue
+                a=i.replace("\n","").replace("\\n", "\n")
                 op.append(a)
             return op
-    def listToFILE(self, lst:list):
+    def listToFILE(self, lst):
         """
         ## Example:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         db.listToFILE(['hello','hallo'])
         ```
         ### New db.list file:
@@ -425,7 +454,16 @@ class pylist:
         with open(self.f, 'w', encoding="utf-8") as f:
             liste= []
             for i in lst:
-                liste.append(str(i).replace("\n","")+"\n")
+                if i==True:
+                    liste.append("{True}\n")
+                    continue
+                if i==False:
+                    liste.append("{False}\n")
+                    continue
+                if i==None:
+                    liste.append("{None}\n")
+                    continue
+                liste.append(str(i).replace("\n","\\n")+"\n")
             f.writelines(liste)
     def addData(self, value):
         """
@@ -438,7 +476,7 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         db.addData("holla")
         ```
         ### New db.list file:
@@ -450,7 +488,14 @@ class pylist:
         """
         with open(self.f, 'r+', encoding="utf-8") as f:
             lines = f.readlines()
-            lines.append(str(value).replace("\n","\\n")+"\n")
+            if value==True:
+                lines.append("{True}\n")
+            if value==False:
+                lines.append("{False}\n")
+            if value==None:
+                lines.append("{None}\n")
+            else:
+                lines.append(str(value).replace("\n","\\n")+"\n")
             f.seek(0)
             f.writelines(lines)
             f.truncate()
@@ -465,7 +510,7 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         db.setData(1, "holla")
         ```
         ### New db.list file:
@@ -476,7 +521,14 @@ class pylist:
         """
         with open(self.f, 'r+', encoding="utf-8") as f:
             lines = f.readlines()
-            lines[int(index)]=str(value).replace("\n","")+"\n"
+            if value==True:
+                lines[int(index)]="{True}\n"
+            if value==False:
+                lines[int(index)]="{False}\n"
+            if value==None:
+                lines[int(index)]="{None}\n"
+            else:
+                lines[int(index)]=str(value).replace("\n","\\n")+"\n"
             f.seek(0)
             f.writelines(lines)
             f.truncate()
@@ -492,7 +544,7 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         db.removeData(2)
         ```
         ### New db.list file:
@@ -520,7 +572,7 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         db.clear()
         ```
         ### New db.list file:
@@ -531,27 +583,6 @@ class pylist:
         f= open(self.f, 'w', encoding="utf-8")
         f.write("")
         f.close()
-    def clear(self):
-        """
-        ## Example:
-        ### file.db file:
-        ```
-        hello
-        hallo
-        ```
-        ### Python File:
-        ```py
-        import PyDB
-        db=PyDB.pylist("file.db")
-        db.clear()
-        ```
-        ### New file.db file:
-        ```
-        (Empty)
-        ```
-        """
-        with open(self.file, 'w') as f:
-            f.write('')
     def backUp(self, newfile:str):
         """
         ## Example:
@@ -563,8 +594,8 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("file.db")
-        db.backUp("newFile.db")
+        db=PyDB.pylist("filename")
+        db.backUp("newFile")
         ```
         ### newFile.db file:
         ```
@@ -574,7 +605,7 @@ class pylist:
         """
         with open(self.file, 'r', encoding="utf-8") as f:
             lines = f.readlines()
-            with open(newfile, 'w') as f:
+            with open(newfile+".pydb", 'w') as f:
                 f.writelines(lines)
     def lenFile(self):
         
@@ -589,7 +620,7 @@ class pylist:
         ### Python File:
         ```py
         import PyDB
-        db=PyDB.pylist("db.list")
+        db=PyDB.pylist("filename")
         print(db.lenFile())
         ```
         ### Output:
@@ -604,6 +635,8 @@ class pylist:
                 a=i.replace("\n","")
                 op.append(a)
             return len(op)
+    def index(self, value):
+        return self.listFile().index(value)
 
 
 def dictToTABLE(dictionary):
@@ -611,46 +644,66 @@ def dictToTABLE(dictionary):
     ## Example:
     ```py
     import PyDB
-    print(PyDB.dictToTABLE({"Key":"Value","Apple":"Orange"}))
+    print(PyDB.dictToTABLE({"apple": "den", "armuts": "den2", 1: 2}))
     ```
     ## Output:
     ```
-    +---------+---------------+
-    |   Key   |     Value     |
-    +---------+---------------+
-    |Key      |Value          |
-    +---------+---------------+
-    |Apple    |Orange         |
-    +---------+---------------+
+    +--------+-------+
+    | Key    | Value |
+    +--------+-------+
+    | apple  | den   |
+    +--------+-------+
+    | armuts | den2  |
+    +--------+-------+
+    | 1      | 2     |
+    +--------+-------+
     ```
     """
-    ll="+"+"-"*9+"+"+"-"*15+"+\n"
-    table=ll+"|   Key   |     Value     |\n"+ll
+    if dictionary=={}:
+        return ""
+    dictin={"Key":"Value"}
     for k,v in dictionary.items():
-        table+="|{:<9}|{:<15}|\n".format(k, v)
-        table+=ll
+        dictin[k]=v
+    max_key_len = max(len(str(k)) for k in dictin.keys())
+    max_val_len = max(len(str(v)) for v in dictin.values())
+    ll = "+" + "-" * (max_key_len + 2) + "+" + "-" * (max_val_len + 2) + "+\n"
+    table = ll
+    for k, v in dictin.items():
+        table += "| {:<{}} | {:<{}} |\n".format(str(k), max_key_len, str(v), max_val_len)
+        table += ll
     return table
-def listToTABLE(list):
+
+def listToTABLE(inplist):
     """
     ## Example:
     ```py
     import PyDB
-    print(PyDB.listToTABLE(["Value","Apple"]))
+    print(PyDB.listToTABLE(["as","asd","jkasdg", True]))
     ```
     ## Output:
     ```
-    +-----+---------------+
-    |Index|     Value     |
-    +-----+---------------+
-    |0    |Value          |
-    +-----+---------------+
-    |1    |Apple          |
-    +-----+---------------+
+    +---+--------+
+    | 0 | as     |
+    +---+--------+
+    | 1 | asd    |
+    +---+--------+
+    | 2 | jkasdg |
+    +---+--------+
+    | 3 | True   |
+    +---+--------+
     ```
     """
-    ll="+"+"-"*5+"+"+"-"*15+"+\n"
-    table=ll+"|Index|     Value     |\n"+ll
-    for v in list:
-        table+="|{:<5}|{:<15}|\n".format(list.index(v), v)
-        table+=ll
+    if tuple(inplist)==tuple(()):
+        return ""
+    dictin={}
+    sayis=range(len(inplist))
+    for i in sayis:
+        dictin[i]=inplist[i]
+    max_key_len = max(len(str(k)) for k in sayis)
+    max_val_len = max(len(str(v)) for v in inplist)
+    ll = "+" + "-" * (max_key_len + 2) + "+" + "-" * (max_val_len + 2) + "+\n"
+    table = ll
+    for k, v in dictin.items():
+        table += "| {:<{}} | {:<{}} |\n".format(str(k), max_key_len, str(v), max_val_len)
+        table += ll
     return table
