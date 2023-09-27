@@ -14,10 +14,10 @@ CommandFolder:commands
 ```
 
 # and you can use..<br>
-## you can use ultimate auto help command<br>
-## you can use ultimate auto commands system<br>
-## you can use multiple prefix system<br>
-and you can use direct:<br>
+- you can use ultimate auto help command<br>
+- you can use ultimate auto commands system<br>
+- you can use multiple prefix system<br>
+- you can use direct :<br>
 https://github.com/sanalzio/PyDB<br>
 https://github.com/sanalzio/PyGistDB<br>
 (with modules.PyDB or modules.pygistdb)
