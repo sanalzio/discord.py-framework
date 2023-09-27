@@ -1,6 +1,7 @@
 """# PyDB
 # A Simple Database Module"""
-__version__ = 1.8
+
+__version__ = 2.0
 __name__ = "pydb"
 
 class pydb:
@@ -12,9 +13,20 @@ class pydb:
     ```
     """
     def __init__(self, file:str):
+        try:
+            f=open(file+".pydb", "r", encoding="utf-8")
+            f.close()
+        except FileNotFoundError:
+            f=open(file+".pydb", "w", encoding="utf-8")
+            f.close()
         self.file=file+".pydb"
+        self.data=self.fileToDICT()
+    def __getattr__(self, name):
+        if name in self.data:
+            return self.getData(name)
+        else:
+            raise AttributeError(f"'pydb' object has no attribute '{name}'")
     def getData(self, key):
-        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -33,6 +45,7 @@ class pydb:
         hello
         ```
         """
+        key=str(key)
         with open(self.file, 'r', encoding="utf-8") as f:
             l = f.readlines()
             for i in l:
@@ -140,7 +153,6 @@ class pydb:
                     items.append([i.split(':')[0].replace("\\n", "\n"), ":".join(i.split(':')[1:]).replace("\n", "").replace("\\n", "\n")])
             return tuple(items)
     def addData(self, key, value):
-        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -161,6 +173,7 @@ class pydb:
         key3:holla
         ```
         """
+        key=str(key)
         with open(self.file, 'r+', encoding="utf-8") as f:
             valu=value
             if value==True:
@@ -184,7 +197,6 @@ class pydb:
             f.writelines(lines)
             f.truncate()
     def removeData(self, key):
-        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -205,6 +217,7 @@ class pydb:
         key2:hallo
         ```
         """
+        key=str(key)
         with open(self.file, 'r+', encoding="utf-8") as f:
             lines = f.readlines()
             for i in lines:
@@ -259,7 +272,6 @@ class pydb:
             with open(newfile+".pydb", 'w') as f:
                 f.writelines(lines)
     def setData(self, key, newValue):
-        key=str(key)
         """
         ## Example:
         ### file.db file:
@@ -279,6 +291,7 @@ class pydb:
         key2:holla
         ```
         """
+        key=str(key)
         if newValue==True:
             valu="{True}"
         if newValue==False:
@@ -320,6 +333,12 @@ class pydb:
                 if i.find(":")!=-1:
                     a=i.split(':')
                     if len(a)==2:
+                        if a[1]=="{True}":
+                            dictionary[a[0]]=True
+                        if a[1]=="{False}":
+                            dictionary[a[0]]=False
+                        if a[1]=="{None}":
+                            dictionary[a[0]]=None
                         dictionary[a[0]]=a[1].replace("\n", "")
                     if len(a)>2:
                         dictionary[a[0]]=":".join(a[1:]).replace("\n", "")
@@ -342,13 +361,19 @@ class pydb:
         with open(self.file, 'w', encoding="utf-8") as f:
             lines=[]
             for k,v in dictionary.items():
-                lines.append("{}:{}\n".format(str(k).replace("\n", "").replace(":", ""),str(v).replace("\n","")))
+                if v==True:
+                    lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{True}"))
+                if v==False:
+                    lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{False}"))
+                if v==None:
+                    lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{None}"))
+                lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),str(v).replace("\n","\\n")))
             f.writelines(lines)
     def control(self, key):
-        key=str(key)
         """
         ### This Command Checks Whether There Is a Counterpart to the Key
         """
+        key=str(key)
         with open(self.file, 'r', encoding="utf-8") as f:
             l= f.readlines()
             for i in l:
@@ -560,7 +585,6 @@ class pylist:
             f.writelines(lines)
             f.truncate()
     def clear(self):
-        
         """
         ## Example:
         ### db.list file:
@@ -608,7 +632,6 @@ class pylist:
             with open(newfile+".pydb", 'w') as f:
                 f.writelines(lines)
     def lenFile(self):
-        
         """
         ## Example:
         ### db.list file:
@@ -636,8 +659,134 @@ class pylist:
                 op.append(a)
             return len(op)
     def index(self, value):
-        return self.listFile().index(value)
+        if not value==True or not value==False or not value==None:
+            if str(value) in self.listFile():
+                return self.listFile().index(str(value))
+            else:
+                return -1
+        else:
+            if value in self.listFile():
+                return self.listFile().index(value)
+            else:
+                return -1
 
+class convert:
+    def csv_to_pydb(csv_file, new_file_name):
+        """
+        ## Example:
+        ### database.csv file content:
+        ```csv
+        keys,variables
+        key1,var1
+        key2,var2
+        ```
+        ### Python code:
+        ```py
+        import PyDB
+        PyDB.convert.csv_to_pydb("database.csv", "database")
+        ```
+        ### Created database.pydb file content:
+        ```
+        key1:var1
+        key2:var2
+        ```
+        """
+        import csv
+        result_dict = {}
+        with open(csv_file, mode='r', encoding='utf-8') as file:
+            line1=file.readline().replace("\n", "")
+            file.seek(0)
+            csv_reader = csv.DictReader(file)
+            args=line1.split(",")
+            key=args[0]
+            var=args[1]
+            for row in csv_reader:
+                result_dict[row[key]] = row[var]
+        with open(new_file_name+".pydb", 'w', encoding="utf-8") as f:
+            lines=[]
+            for k,v in result_dict.items():
+                if v==True:
+                    lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{True}"))
+                if v==False:
+                    lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{False}"))
+                if v==None:
+                    lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{None}"))
+                lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),str(v).replace("\n","\\n")))
+            f.writelines(lines)
+        return new_file_name+".pydb"
+
+    def json_to_pydb(json_file, new_file_name):
+        """
+        # Examples:
+        ## Dictionary
+        ### database.json file content
+        ```json
+        {
+        "key1": "var1",
+        "key2": "var2"
+        }
+        ```
+        ### Python code:
+        ```py
+        import PyDB
+        PyDB.convert.json_to_pydb("database.json", "database")
+        ```
+        ### Created database.pydb file content:
+        ```
+        key1:var1
+        key2:var2
+        ```
+        ## List
+        ### database.json file content
+        ```json
+        [
+        "var1",
+        "var2"
+        ]
+        ```
+        ### Python code:
+        ```py
+        import PyDB
+        PyDB.convert.json_to_pydb("database.json", "database")
+        ```
+        ### Created database.pydb file content:
+        ```
+        var1
+        var2
+        ```
+        """
+        import json
+        data=None
+        with open(json_file, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+        if type(data)==dict:
+            with open(new_file_name+".pydb", 'w', encoding="utf-8") as f:
+                lines=[]
+                for k,v in data.items():
+                    if v==True:
+                        lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{True}"))
+                    if v==False:
+                        lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{False}"))
+                    if v==None:
+                        lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),"{None}"))
+                    lines.append("{}:{}\n".format(str(k).replace("\n", "\\n").replace(":", ""),str(v).replace("\n","\\n")))
+                f.writelines(lines)
+        elif type(data)==list:
+            with open(new_file_name+".pydb", 'w', encoding="utf-8") as f:
+                liste= []
+                for i in data:
+                    if i==True:
+                        liste.append("{True}\n")
+                        continue
+                    if i==False:
+                        liste.append("{False}\n")
+                        continue
+                    if i==None:
+                        liste.append("{None}\n")
+                        continue
+                    liste.append(str(i).replace("\n","\\n")+"\n")
+                f.writelines(liste)
+        return new_file_name+".pydb"
 
 def dictToTABLE(dictionary):
     """

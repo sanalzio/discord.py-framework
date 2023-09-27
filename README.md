@@ -2,18 +2,15 @@
 A simple discord.py library discord bot framework.
 
 # cutomize<br>
-edit database\config.py file
-```py
-import discord
-CommandFolder="commands"
-con={
-    "token": "YOUR TOKEN",
-    "prefixs": ["!"],
-    "botname": "discord.py-Bot",
-    "color": 0x1f8b4c,
-    "status": "use '!help'",
-    "statusgame": discord.ActivityType.playing
-}
+edit database\config.pydb file
+```
+token:Your token
+prefixs:!-.
+color:#1f8b4c
+status:use '!help'
+botname:discord.py-Bot
+ActivityType:playing
+CommandFolder:commands
 ```
 
 # and you can use..<br>
