@@ -5,9 +5,9 @@ A simple discord.py library discord bot framework.
 edit database\config.pydb file **(If you want to use multiple prefixes, separate them with a hyphen (-).)**
 ```
 token:Your token
-prefixs:!-.mybot-.
+prefixs:!-.mybot -.
 color:#1f8b4c
-status:use '!help' or '.help' or '.mybothelp'
+status:use '!help' or '.help' or '.mybot help'
 botname:discord.py-Bot
 ActivityType:playing
 CommandFolder:commands
