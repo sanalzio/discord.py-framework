@@ -2,7 +2,7 @@
 A simple discord.py library discord bot framework.
 
 # cutomize<br>
-edit database\config.pydb file (If you want to use multiple prefixes, separate them with a hyphen (-).)
+edit database\config.pydb file **(If you want to use multiple prefixes, separate them with a hyphen (-).)**
 ```
 token:Your token
 prefixs:!-mybot -.
