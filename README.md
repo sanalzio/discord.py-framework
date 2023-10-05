@@ -1,6 +1,8 @@
 # discord.py-framework
 A simple discord.py library discord bot framework.
 
+![logo](image.svg)
+
 # cutomize<br>
 edit database\config.pydb file **(If you want to use multiple prefixes, separate them with a hyphen (-).)**
 ```
